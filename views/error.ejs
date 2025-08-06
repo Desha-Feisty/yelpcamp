@@ -1,0 +1,23 @@
+<% layout('layouts/boilerplate.ejs') %>
+<div class="row">
+    <div class="col-6 offset-3">
+        <div class="alert alert-danger" role="alert">
+            <h4 class="alert-heading">
+                <ul>
+                    <% if (Array.isArray(err.message)) { %>
+                    <% err.message.forEach(msg => { %>
+                    <li><%= msg %></li>
+                    <% }) %>
+                    <% } else { %>
+                    <li><%= err.message %></li>
+                    <% } %>
+                </ul>
+            </h4>
+            <p>
+                AWw yeah, you succesfuly read this alert ...
+            </p>
+            <hr>
+            <p class="mb-0">whenever you need to, be sure to</p>
+        </div>
+    </div>
+</div>
