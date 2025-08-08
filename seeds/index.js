@@ -23,7 +23,8 @@ async function seedDB(){
             title: `${sample(descriptors)} ${sample(places)}`,
             image:`https://picsum.photos/400?random=${Math.random()}`,
             description:'Lorem ipsum dolor sit amet consectetur adipisicing elit. Cum praesentium illum suscipit mollitia magni blanditiis ut minima quae veniam laborum!',
-            price: price
+            price: price,
+            author: '6893e2f0c09bcef7c1305fa9'
         })
         await camp.save()
     }
