@@ -6,7 +6,6 @@ const Campground = require("./models/campground");
 const methodOverride = require("method-override");
 const morgan = require("morgan");
 const ejsMate = require("ejs-mate");
-const Joi = require("joi");
 const campgroundRoutes = require("./routes/campgroundRoutes.js");
 const reviewRoutes = require("./routes/reviewRoutes.js");
 const session = require("express-session");
@@ -49,11 +48,7 @@ passport.use(new localStrategy(User.authenticate()));
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
-// app.use((req, res, next)=> {
-//     req.requestTime = Date.now()
-//     console.log(req.method.toUpperCase(), req.path)
-//     next()
-// })
+
 app.use((req, res, next) => {
   res.locals.currentUser = req.user;
   res.locals.success = req.flash("success");

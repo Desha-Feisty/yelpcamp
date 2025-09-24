@@ -4,7 +4,7 @@ const Campground = require("./models/campground");
 const Review = require("./models/review");
 
 module.exports.isLoggedIn = (req, res, next) => {
-  console.log(`Request user: ${req.user}`);
+    console.log("is loogedin")
   if (!req.isAuthenticated()) {
     req.flash("error", "You have to sign in first");
     return res.redirect("/login");
@@ -12,7 +12,8 @@ module.exports.isLoggedIn = (req, res, next) => {
   next();
 };
 module.exports.validateCampground = (req, res, next) => {
-  const { error } = campgroundSchema.validate(req.body);
+  console.log("validateCampground", req.body.campground)
+  const { error } = campgroundSchema.validate(req.body.campground);
   if (error) {
     const msgArray = error.details.map((el) => el.message);
     throw new ExpressError(msgArray, 400);

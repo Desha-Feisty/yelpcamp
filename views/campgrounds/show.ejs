@@ -1,5 +1,5 @@
 <% layout('layouts/boilerplate')%>
-
+<link rel="stylesheet" href="/stylesheets/stars.css">
 <div
   class="row justify-content-center align-items-start"
   style="min-height: 70vh"
@@ -72,15 +72,20 @@
         novalidate
       >
         <div class="mb-2">
-          <label for="rating" class="form-label">Rating</label>
-          <input
-            class="form-range"
-            type="range"
-            min="1"
-            max="5"
-            name="rating"
-            id="rating"
-          />
+<fieldset class="starability-basic">
+  <legend>rating:</legend>
+  <input type="radio" id="no-rate" class="input-no-rate" name="rating" value="0" checked aria-label="No rating." />
+  <input type="radio" id="first-rate1" name="rating" value="1" />
+  <label for="first-rate1" title="Terrible">1 star</label>
+  <input type="radio" id="first-rate2" name="rating" value="2" />
+  <label for="first-rate2" title="Not good">2 stars</label>
+  <input type="radio" id="first-rate3" name="rating" value="3" />
+  <label for="first-rate3" title="Average">3 stars</label>
+  <input type="radio" id="first-rate4" name="rating" value="4" />
+  <label for="first-rate4" title="Very good">4 stars</label>
+  <input type="radio" id="first-rate5" name="rating" value="5" />
+  <label for="first-rate5" title="Amazing">5 stars</label>
+</fieldset>
         </div>
         <div class="mb-2">
           <label class="form-label" for="body">Review</label>
@@ -99,9 +104,9 @@
       <% } %> <% for(let review of campground.reviews){%>
       <div class="card mb-2" style="font-size: 0.95rem">
         <div class="card-body p-2">
-          <h6 class="card-title mb-1">Rating: <%= review.rating %>⭐</h6>
+          <p class="starability-result" data-rating="<%= review.rating %>"></p>
           <p class="mb-0">- <%= review.body %></p>
-          <p>-<i><%= review.author.username %></i></p>
+          <p>by <i><%= review.author.username %></i></p>
           <% if(currentUser && review.author &&
           currentUser._id.equals(review.author._id)){ %>
           <form
