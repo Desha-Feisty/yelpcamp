@@ -36,8 +36,6 @@ module.exports.createCampground = async (req, res, next) => {
     }));
     campground.author = req.user._id;
     await campground.save();
-    console.log(req.files);
-    console.log(campground);
     req.flash("success", "successfully made a new campground");
     res.redirect(`/campgrounds/${campground._id}`);
 };
@@ -59,7 +57,6 @@ module.exports.showCampground = async (req, res) => {
 };
 module.exports.updateCampground = async (req, res) => {
     const { id } = req.params;
-    console.log(req.body);
     const geoData = await maptilerClient.geocoding.forward(
         req.body.campground.location,
         { limit: 1 }
@@ -73,7 +70,7 @@ module.exports.updateCampground = async (req, res) => {
         return res.redirect(`/campgrounds/${id}/edit`);
     }
     // Only update the fields that are in the schema
-    const campground = await Campground.findByIdAndUpdate(id, req.body, {
+    const campground = await Campground.findByIdAndUpdate(id, req.body.campground, {
         new: true,
     });
     campground.geometry = geoData.features[0].geometry;

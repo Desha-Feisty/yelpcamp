@@ -30,21 +30,14 @@
                     <ul class="list-group list-group-flush">
                         <li class="list-group-item text-muted"><%= campground.location%></li>
                         <li class="list-group-item">Submitted by   <% if (campground.author) { %>
-                            Submitted by <%= campground.author.username %>
+                            <%= campground.author.username %>
                             <% } else { %>
                                 Desha
                                 <% } %></li>
                                 <li class="list-group-item">$<%= campground.price%>/night</li>
                             </ul>
-                                        <%  if( currentUser && campground.author == currentUser._id)  {%>
-            <div class="card-body">
-                <a class="card-link btn btn-info" href="/campgrounds/<%=campground._id%>/edit">Edit</a>
-                <form class="d-inline" action="/campgrounds/<%=campground._id%>?_method=DELETE" method="POST">
-                    <button class="btn btn-danger">Delete</button>
-                </form>
-            </div>
-            <% } %>
-                            <%  if(currentUser && campground.author && currentUser._id.equals(campground.author))   {%>
+
+                            <%  if(currentUser && campground.author && currentUser._id && (currentUser._id.toString() === campground.author._id.toString())){%>
                                 <div class="card-body">
                                     <a class="card-link btn btn-info" href="/campgrounds/<%=campground._id%>/edit">Edit</a>
                                     <form class="d-inline" action="/campgrounds/<%=campground._id%>?_method=DELETE" method="POST">
