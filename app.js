@@ -1,5 +1,5 @@
-if(process.env.NODE_ENV !== "production"){
-  require("dotenv").config()
+if (process.env.NODE_ENV !== "production") {
+    require("dotenv").config();
 }
 const express = require("express");
 const mongoose = require("mongoose");
@@ -17,30 +17,36 @@ const passport = require("passport");
 const localStrategy = require("passport-local");
 const User = require("./models/user.js");
 const userRoutes = require("./routes/users.js");
+const sanitizeV5 = require("./utils/mongoSanitizeV5.js");
+const helmet = require("helmet");
 
 main().catch((err) => console.log(err));
 
 async function main() {
-  await mongoose.connect("mongodb://127.0.0.1:27017/yelpcamp");
+    await mongoose.connect("mongodb://127.0.0.1:27017/yelpcamp");
 }
 
 const app = express();
+app.set("query parser", "extended");
 app.engine("ejs", ejsMate);
 app.set("view engine", "ejs");
+app.use(sanitizeV5({ replaceWith: "_" }));
 app.set("views", path.join(__dirname, "views"));
 app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride("_method"));
 app.use(morgan("tiny"));
+app.use(helmet({ contentSecurityPolicy: false }));
 
 const sessionConfig = {
-  secret: "thisshouldbeabettersecret",
-  resave: false,
-  saveUninitialized: true,
-  cookie: {
-    httpOnly: true,
-    expires: Date.now() + 1000 * 60 * 60 * 24 * 7,
-    maxAge: 1000 * 60 * 60 * 24 * 7,
-  },
+    name: "session",
+    secret: "thisshouldbeabettersecret",
+    resave: false,
+    saveUninitialized: true,
+    cookie: {
+        httpOnly: true,
+        expires: Date.now() + 1000 * 60 * 60 * 24 * 7,
+        maxAge: 1000 * 60 * 60 * 24 * 7,
+    },
 };
 app.use(session(sessionConfig));
 app.use(flash());
@@ -51,12 +57,56 @@ passport.use(new localStrategy(User.authenticate()));
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
-
 app.use((req, res, next) => {
-  res.locals.currentUser = req.user;
-  res.locals.success = req.flash("success");
-  res.locals.error = req.flash("error");
-  next();
+    console.log(req.query);
+    res.locals.currentUser = req.user;
+    res.locals.success = req.flash("success");
+    res.locals.error = req.flash("error");
+    next();
+});
+
+const scriptSrcUrls = [
+    "https://stackpath.bootstrapcdn.com/",
+    "https://kit.fontawesome.com/",
+    "https://cdnjs.cloudflare.com/",
+    "https://cdn.jsdelivr.net",
+    "https://cdn.maptiler.com/",
+];
+const styleSrcUrls = [
+    "https://kit-free.fontawesome.com/",
+    "https://stackpath.bootstrapcdn.com/",
+    "https://fonts.googleapis.com/",
+    "https://use.fontawesome.com/",
+    "https://cdn.jsdelivr.net",
+    "https://cdn.maptiler.com/",
+];
+const connectSrcUrls = [
+    "https://api.maptiler.com/",
+];
+const fontSrcUrls = [];
+app.use(
+    helmet.contentSecurityPolicy({
+        directives: {
+            defaultSrc: [],
+            connectSrc: ["'self'", ...connectSrcUrls],
+            scriptSrc: ["'unsafe-inline'", "'self'", ...scriptSrcUrls],
+            styleSrc: ["'self'", "'unsafe-inline'", ...styleSrcUrls],
+            workerSrc: ["'self'", "blob:"],
+            objectSrc: [],
+            imgSrc: [
+                "'self'",
+                "blob:",
+                "data:",
+                "https://res.cloudinary.com/disfsizmf/", 
+                "https://images.unsplash.com/",
+            ],
+            fontSrc: ["'self'", ...fontSrcUrls],
+        },
+    })
+);
+
+app.get("/", (req, res) => {
+    res.render("campgrounds/home");
 });
 app.use("/campgrounds", campgroundRoutes);
 app.use("/campgrounds/:id/reviews", reviewRoutes);
@@ -64,20 +114,12 @@ app.use("/", userRoutes);
 
 app.use(express.static(path.join(__dirname, "public")));
 
-// app.use((req, res)=>{
-//     res.status(404).send('NOT FOUND !')
-// })
-
-// app.use((err, req, res, next) => {
-//     console.log("************************")
-//     console.log("******** ERROR *********")
-//     console.log("************************")
-//     const{ status = 500 } = err
-//     const { message = 'something ewent wrong' } = err
-//     res.status(status).send(message)
-//     // next(err)
-// })
+app.use((err, req, res, next) => {
+    const { statusCode = 500 } = err;
+    if (!err.message) err.message = "Oh No, Something Went Wrong!";
+    res.status(statusCode).render("error", { err });
+});
 
 app.listen(3000, () => {
-  console.log("server running on port 3000");
+    console.log("server running on port 3000");
 });

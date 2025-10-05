@@ -1,5 +1,7 @@
 const Campground = require("../models/campground");
 const { cloudinary } = require("../cloudinary");
+const maptilerClient = require("@maptiler/client");
+maptilerClient.config.apiKey = process.env.MAPTILER_API_KEY;
 
 module.exports.index = async (req, res) => {
     const campgrounds = await Campground.find({});
@@ -12,7 +14,22 @@ module.exports.renderNewForm = async (req, res) => {
 };
 
 module.exports.createCampground = async (req, res, next) => {
+    const geoData = await maptilerClient.geocoding.forward(
+        req.body.campground.location,
+        { limit: 1 }
+    );
+    console.log(geoData);
+    if (!geoData.features?.length) {
+        req.flash(
+            "error",
+            "Could not geocode that location. Please try again and enter a valid location."
+        );
+        return res.redirect("/campgrounds/new");
+    }
+
     const campground = new Campground(req.body.campground);
+    campground.geometry = geoData.features[0].geometry;
+    campground.location = geoData.features[0].place_name;
     campground.image = req.files.map((f) => ({
         url: f.path,
         filename: f.filename,
@@ -27,13 +44,13 @@ module.exports.createCampground = async (req, res, next) => {
 
 module.exports.showCampground = async (req, res) => {
     const campground = await Campground.findById(req.params.id)
-    .populate({
-        path: "reviews",
-        populate: {
-            path: "author",
-        },
-    })
-    .populate("author");
+        .populate({
+            path: "reviews",
+            populate: {
+                path: "author",
+            },
+        })
+        .populate("author");
     if (!campground) {
         req.flash("error", "Cannot find that campground");
         return res.redirect("/campgrounds");
@@ -43,10 +60,24 @@ module.exports.showCampground = async (req, res) => {
 module.exports.updateCampground = async (req, res) => {
     const { id } = req.params;
     console.log(req.body);
+    const geoData = await maptilerClient.geocoding.forward(
+        req.body.campground.location,
+        { limit: 1 }
+    );
+    // console.log(geoData);
+    if (!geoData.features?.length) {
+        req.flash(
+            "error",
+            "Could not geocode that location. Please try again and enter a valid location."
+        );
+        return res.redirect(`/campgrounds/${id}/edit`);
+    }
     // Only update the fields that are in the schema
     const campground = await Campground.findByIdAndUpdate(id, req.body, {
         new: true,
     });
+    campground.geometry = geoData.features[0].geometry;
+    campground.location = geoData.features[0].place_name;
     // Add new uploaded images if any
     if (req.files && req.files.length > 0) {
         const imgs = req.files.map((f) => ({

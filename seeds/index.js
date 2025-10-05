@@ -22,6 +22,13 @@ async function seedDB() {
         const camp = await new Campground({
             location: `${cities[randThou].city}, ${cities[randThou].state}`,
             title: `${sample(descriptors)} ${sample(places)}`,
+                        geometry: {
+                type: "Point",
+                coordinates: [
+                    cities[randThou].longitude,
+                    cities[randThou].latitude,
+                ]
+            },
             image: [
                 {
                     url: "https://res.cloudinary.com/disfsizmf/image/upload/v1758888416/yelpcamp/iqjhv9teuzspqeavzrse.webp",

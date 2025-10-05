@@ -46,6 +46,8 @@ router.get(
     })
 );
 
+
+
 router
 .route("/:id")
 .get(catchAsync(campgrounds.showCampground))
