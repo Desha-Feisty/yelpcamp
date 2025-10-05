@@ -82,6 +82,10 @@ const styleSrcUrls = [
 ];
 const connectSrcUrls = [
     "https://api.maptiler.com/",
+    "https://cdn.jsdelivr.net/",
+    "https://stackpath.bootstrapcdn.com/",
+    "https://cdn.maptiler.com/"
+
 ];
 const fontSrcUrls = [];
 app.use(
@@ -99,6 +103,9 @@ app.use(
                 "data:",
                 "https://res.cloudinary.com/disfsizmf/", 
                 "https://images.unsplash.com/",
+                "https://wallpapers.com/images/featured/camping-background-rgj5169zktuggn6e.jpg",
+                "https://res.cloudinary.com/disfsizmf/image/upload/v1759607977/camp_ioofos.webp",
+                "https://api.maptiler.com/"
             ],
             fontSrc: ["'self'", ...fontSrcUrls],
         },

@@ -1,5 +1,5 @@
 <% layout('layouts/boilerplate.ejs') %>
-<div class="container py-5">
+<div class="container py-5" style="margin-top: -80px; margin-bottom: -40px;">
     <div class="row justify-content-center align-items-center" style="min-height: 80vh;">
         <div class="col-12 col-md-8 col-lg-6">
             <div class="card shadow-lg border-0 rounded-4">
@@ -15,10 +15,6 @@
                             <label class="form-label fw-semibold" for="location">Location</label>
                             <input required class="form-control" type="text" name="campground[location]" id="location">
                         </div>
-                        <!-- <div class="mb-4">
-                            <label class="form-label fw-semibold" for="image">Image</label>
-                            <input required class="form-control" type="file" name="campground[image]" id="image" multiple>
-                        </div> -->
                         <div class="mb-4">
                             <label class="form-label fw-semibold" for="description">Description</label>
                             <textarea required class="form-control" name="campground[description]" id="description" rows="3"></textarea>
