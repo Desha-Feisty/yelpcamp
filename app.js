@@ -3,7 +3,7 @@ if (process.env.NODE_ENV !== "production") {
 }
 const express = require("express");
 const mongoose = require("mongoose");
-const dbUrl = process.env.DB_URL
+const dbUrl = process.env.DB_URL;
 const ejs = require("ejs");
 const path = require("path");
 const Campground = require("./models/campground");
@@ -20,12 +20,17 @@ const User = require("./models/user.js");
 const userRoutes = require("./routes/users.js");
 const sanitizeV5 = require("./utils/mongoSanitizeV5.js");
 const helmet = require("helmet");
-const MongoDBStore = require("connect-mongo")(session)
+const MongoDBStore = require("connect-mongo")(session);
 
 main().catch((err) => console.log(err));
 
 async function main() {
-    await mongoose.connect(process.env.DB_URL);
+    await mongoose.connect(process.env.DB_URL, {
+        tls: true,
+        tlsInsecure: false,
+        ssl: true,
+        sslValidate: true,
+    });
 }
 
 const app = express();
@@ -39,15 +44,20 @@ app.use(methodOverride("_method"));
 app.use(morgan("tiny"));
 app.use(helmet({ contentSecurityPolicy: false }));
 
-
 const store = new MongoDBStore({
     url: process.env.DB_URL,
     secret: "thisshouldbeabettersecret",
-    touchAfter: 24 * 3600
-})
-store.on("error", function(e){
-    console.log("Session store error", e)
-})
+    touchAfter: 24 * 3600,
+    ssl: true,
+    sslValidate: true,
+    mongoOptions: {
+        tls: true,
+        tlsInsecure: false,
+    },
+});
+store.on("error", function (e) {
+    console.log("Session store error", e);
+});
 
 const sessionConfig = {
     store,
@@ -97,8 +107,7 @@ const connectSrcUrls = [
     "https://api.maptiler.com/",
     "https://cdn.jsdelivr.net/",
     "https://stackpath.bootstrapcdn.com/",
-    "https://cdn.maptiler.com/"
-
+    "https://cdn.maptiler.com/",
 ];
 const fontSrcUrls = [];
 app.use(
@@ -114,11 +123,11 @@ app.use(
                 "'self'",
                 "blob:",
                 "data:",
-                "https://res.cloudinary.com/disfsizmf/", 
+                "https://res.cloudinary.com/disfsizmf/",
                 "https://images.unsplash.com/",
                 "https://wallpapers.com/images/featured/camping-background-rgj5169zktuggn6e.jpg",
                 "https://res.cloudinary.com/disfsizmf/image/upload/v1759607977/camp_ioofos.webp",
-                "https://api.maptiler.com/"
+                "https://api.maptiler.com/",
             ],
             fontSrc: ["'self'", ...fontSrcUrls],
         },
