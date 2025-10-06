@@ -26,10 +26,8 @@ main().catch((err) => console.log(err));
 
 async function main() {
     await mongoose.connect(process.env.DB_URL, {
-        tls: true,
-        tlsInsecure: false,
         ssl: true,
-        sslValidate: true,
+        tls: true,
     });
 }
 
@@ -48,11 +46,9 @@ const store = new MongoDBStore({
     url: process.env.DB_URL,
     secret: "thisshouldbeabettersecret",
     touchAfter: 24 * 3600,
-    ssl: true,
-    sslValidate: true,
     mongoOptions: {
+        ssl: true,
         tls: true,
-        tlsInsecure: false,
     },
 });
 store.on("error", function (e) {
