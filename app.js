@@ -3,6 +3,7 @@ if (process.env.NODE_ENV !== "production") {
 }
 const express = require("express");
 const mongoose = require("mongoose");
+const dbUrl = process.env.DB_URL
 const ejs = require("ejs");
 const path = require("path");
 const Campground = require("./models/campground");
@@ -19,11 +20,12 @@ const User = require("./models/user.js");
 const userRoutes = require("./routes/users.js");
 const sanitizeV5 = require("./utils/mongoSanitizeV5.js");
 const helmet = require("helmet");
+const MongoDBStore = require("connect-mongo")(session)
 
 main().catch((err) => console.log(err));
 
 async function main() {
-    await mongoose.connect("mongodb://127.0.0.1:27017/yelpcamp");
+    await mongoose.connect(process.env.DB_URL);
 }
 
 const app = express();
@@ -37,7 +39,18 @@ app.use(methodOverride("_method"));
 app.use(morgan("tiny"));
 app.use(helmet({ contentSecurityPolicy: false }));
 
+
+const store = new MongoDBStore({
+    url: process.env.DB_URL,
+    secret: "thisshouldbeabettersecret",
+    touchAfter: 24 * 3600
+})
+store.on("error", function(e){
+    console.log("Session store error", e)
+})
+
 const sessionConfig = {
+    store,
     name: "session",
     secret: "thisshouldbeabettersecret",
     resave: false,
