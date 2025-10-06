@@ -25,10 +25,7 @@ const MongoDBStore = require("connect-mongo")(session);
 main().catch((err) => console.log(err));
 
 async function main() {
-    await mongoose.connect(process.env.DB_URL, {
-        ssl: true,
-        tls: true,
-    });
+    await mongoose.connect(process.env.DB_URL);
 }
 
 const app = express();
@@ -46,10 +43,6 @@ const store = new MongoDBStore({
     url: process.env.DB_URL,
     secret: "thisshouldbeabettersecret",
     touchAfter: 24 * 3600,
-    mongoOptions: {
-        ssl: true,
-        tls: true,
-    },
 });
 store.on("error", function (e) {
     console.log("Session store error", e);
